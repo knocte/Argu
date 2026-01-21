@@ -987,6 +987,22 @@ module ``Argu Tests Main List`` =
         raisesWith<ArguException> <@ ArgumentParser.Create<MixedPascalCaseWithUnderscoreArguments>(pascalCase = true) @>
                             (fun e -> <@ e.FirstLine.Contains "Mixed" @>)
 
+    type InsensitiveCaseArguments =
+        | Very_Verbose
+        | Log_Level of int
+
+    [<Fact>]
+    let ``Simple command line parsing with opt-in case insensitiveness`` () =
+        let args =
+            [| "--Very-Verbose" ; "--log-Level" ; "2" |]
+
+        let expected_outcome = [ Very_Verbose ; Log_Level 2 ]
+        let results = ArgumentParser.Create<InsensitiveCaseArguments>(caseInsensitive = true).ParseCommandLine args
+
+        test <@ results.GetAllResults() = expected_outcome @>
+        test <@ results.Contains <@ InsensitiveCaseArguments.Very_Verbose @> @>
+        test <@ results.GetResults <@ InsensitiveCaseArguments.Log_Level @> = [2] @>
+
 
 module ``Argu Tests Main Primitive`` =
 
