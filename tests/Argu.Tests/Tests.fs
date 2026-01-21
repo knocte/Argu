@@ -1004,6 +1004,24 @@ module ``Argu Tests Main List`` =
         test <@ results.GetResults <@ InsensitiveCaseArguments.Log_Level @> = [2] @>
 
 
+    type InsensitiveAndPascalCaseArguments =
+        | VeryVerbose
+        | LogLevel of int
+
+    [<Fact>]
+    let ``Simple command line parsing with opt-in PascalCase *and* case insensitiveness`` () =
+        let args =
+            [| "--veryVerbose" ; "--logLevel" ; "2" |]
+
+        let expected_outcome = [ VeryVerbose ; LogLevel 2 ]
+        let results = ArgumentParser.Create<InsensitiveAndPascalCaseArguments>(caseInsensitive = true, pascalCase = true).ParseCommandLine args
+
+        test <@ results.GetAllResults() = expected_outcome @>
+        test <@ results.Contains <@ InsensitiveAndPascalCaseArguments.VeryVerbose @> @>
+        test <@ results.GetResults <@ InsensitiveAndPascalCaseArguments.LogLevel @> = [2] @>
+
+
+
 module ``Argu Tests Main Primitive`` =
 
     type Exception with
