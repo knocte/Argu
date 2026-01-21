@@ -962,6 +962,23 @@ module ``Argu Tests Main List`` =
         test <@ r.Parser.PrintUsage().Contains "will be shown" @>
         test <@ r.Parser.PrintUsage().Contains "will be hidden" |> not @>
 
+    type PascalCaseArguments =
+        | VeryVerbose
+        | LogLevel of int
+
+    [<Fact>]
+    let ``Simple command line parsing with opt-in PascalCase`` () =
+        let args =
+            [| "--very-verbose" ; "--log-level" ; "2" |]
+
+        let expected_outcome = [ VeryVerbose ; LogLevel 2 ]
+        let results = ArgumentParser.Create<PascalCaseArguments>(pascalCase = true).ParseCommandLine args
+
+        test <@ results.GetAllResults() = expected_outcome @>
+        test <@ results.Contains <@ VeryVerbose @> @>
+        test <@ results.GetResults <@ LogLevel @> = [2] @>
+
+
 module ``Argu Tests Main Primitive`` =
 
     type Exception with
