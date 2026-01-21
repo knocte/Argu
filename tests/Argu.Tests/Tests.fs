@@ -978,6 +978,15 @@ module ``Argu Tests Main List`` =
         test <@ results.Contains <@ VeryVerbose @> @>
         test <@ results.GetResults <@ LogLevel @> = [2] @>
 
+    type MixedPascalCaseWithUnderscoreArguments =
+        | Very_Verbose
+        | LogLevel of int
+
+    [<Fact>]
+    let ``Fail on mixed DU when opt-in PascalCase`` () =
+        raisesWith<ArguException> <@ ArgumentParser.Create<MixedPascalCaseWithUnderscoreArguments>(pascalCase = true) @>
+                            (fun e -> <@ e.FirstLine.Contains "Mixed" @>)
+
 
 module ``Argu Tests Main Primitive`` =
 
